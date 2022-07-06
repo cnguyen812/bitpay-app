@@ -56,7 +56,7 @@ static void InitializeFlipper(UIApplication *application) {
   rootViewController.view = rootView;
   self.window.rootViewController = rootViewController;
   [self.window makeKeyAndVisible];
-  [RNBootSplash initWithStoryboard:@"BootSplash" rootView:rootView];
+  // [RNBootSplash initWithStoryboard:@"BootSplash" rootView:rootView];
 
   [Appboy startWithApiKey:@"BRAZE_API_KEY_REPLACE_ME"
            inApplication:application

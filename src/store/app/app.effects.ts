@@ -72,7 +72,9 @@ export const startAppInit = (): Effect => async (dispatch, getState) => {
     dispatch(LogActions.clear());
     dispatch(LogActions.info(`Initializing app (${__DEV__ ? 'D' : 'P'})...`));
 
+    dispatch(LogActions.debug('startWalletStoreInit...'));
     await dispatch(startWalletStoreInit());
+    dispatch(LogActions.debug('startWalletStoreInit complete'));
 
     const {appFirstOpenData, onboardingCompleted, migrationComplete} =
       getState().APP;
@@ -87,8 +89,12 @@ export const startAppInit = (): Effect => async (dispatch, getState) => {
     }
 
     if (!migrationComplete) {
+      dispatch(LogActions.debug('startMigration...'));
       await dispatch(startMigration());
       dispatch(setMigrationComplete());
+      dispatch(LogActions.debug('startMigration complete'));
+    } else {
+      dispatch(LogActions.debug('migrationComplete, skipping migration'));
     }
 
     const {BITPAY_ID} = getState();
@@ -148,30 +154,46 @@ export const startAppInit = (): Effect => async (dispatch, getState) => {
           ),
         );
       }
+    } else {
+      dispatch(LogActions.debug('App not paired, skipping user fetch'));
     }
 
     // splitting inits into store specific ones as to keep it cleaner in the main init here
+    dispatch(LogActions.debug('walletConnectInit...'));
     await dispatch(walletConnectInit());
+    dispatch(LogActions.debug('walletConnectInit complete'));
+
+    dispatch(LogActions.debug('initializeBrazeContent...'));
     await dispatch(initializeBrazeContent());
+    dispatch(LogActions.debug('initializeBrazeContent complete'));
 
     // Update Coinbase
+    dispatch(LogActions.debug('coinbaseInitialize...'));
     dispatch(coinbaseInitialize());
+    dispatch(LogActions.debug('coinbaseInitialize complete'));
+
     dispatch(showBlur(pinLockActive || biometricLockActive));
+    dispatch(LogActions.debug('successAppInit...'));
     dispatch(AppActions.successAppInit());
+    dispatch(LogActions.debug('successAppInit complete'));
+
     await sleep(500);
+    
     dispatch(LogActions.info('Initialized app successfully.'));
     dispatch(LogActions.debug(`Pin Lock Active: ${pinLockActive}`));
     dispatch(LogActions.debug(`Biometric Lock Active: ${biometricLockActive}`));
-    RNBootSplash.hide({fade: true}).then(() => {
-      // avoid splash conflicting with modal in iOS
-      // https://stackoverflow.com/questions/65359539/showing-a-react-native-modal-right-after-app-startup-freezes-the-screen-in-ios
-      if (pinLockActive) {
-        dispatch(AppActions.showPinModal({type: 'check'}));
-      }
-      if (biometricLockActive) {
-        dispatch(AppActions.showBiometricModal());
-      }
-    });
+
+    // HARDCODING FOR CUSTOM BUILD, DO NOT RELEASE TO PROD
+    // RNBootSplash.hide({fade: true}).then(() => {
+    // avoid splash conflicting with modal in iOS
+    // https://stackoverflow.com/questions/65359539/showing-a-react-native-modal-right-after-app-startup-freezes-the-screen-in-ios
+    if (pinLockActive) {
+      dispatch(AppActions.showPinModal({type: 'check'}));
+    }
+    if (biometricLockActive) {
+      dispatch(AppActions.showBiometricModal());
+    }
+    // });
   } catch (err: unknown) {
     let errorStr;
     if (err instanceof Error) {

@@ -112,9 +112,7 @@ export const startMigration =
       const goToNewUserOnboarding = () => {
         dispatch(setIntroCompleted());
         navigationRef.dispatch(
-          StackActions.replace('Onboarding', {
-            screen: 'OnboardingStart',
-          }),
+          StackActions.replace('Debug'),
         );
       };
 

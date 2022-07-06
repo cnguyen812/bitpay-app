@@ -323,11 +323,14 @@ export default () => {
   const theme = scheme === 'dark' ? BitPayDarkTheme : BitPayLightTheme;
 
   // ROOT STACKS AND GLOBAL COMPONENTS
-  const initialRoute = onboardingCompleted
-    ? RootStacks.TABS
-    : introCompleted
-    ? RootStacks.ONBOARDING
-    : RootStacks.INTRO;
+  // const initialRoute = onboardingCompleted
+  //   ? RootStacks.TABS
+  //   : introCompleted
+  //   ? RootStacks.ONBOARDING
+  //   : RootStacks.INTRO;
+
+  // HARDCODING FOR CUSTOM BUILD, DO NOT RELEASE TO PROD
+  const initialRoute = RootStacks.DEBUG;
 
   const showDevtools = __DEV__ && DEVTOOLS_ENABLED;
 
@@ -350,15 +353,16 @@ export default () => {
           onReady={async () => {
             // routing to previous route if onboarding
             if (currentRoute && !onboardingCompleted) {
-              const [currentStack, params] = currentRoute;
-              navigationRef.navigate(currentStack, params);
-              dispatch(
-                LogActions.info(
-                  `Navigating to cached route... ${currentStack} ${JSON.stringify(
-                    params,
-                  )}`,
-                ),
-              );
+              // const [currentStack, params] = currentRoute;
+              // navigationRef.navigate(currentStack, params);
+
+              // dispatch(
+              //   LogActions.info(
+              //     `Navigating to cached route... ${currentStack} ${JSON.stringify(
+              //       params,
+              //     )}`,
+              //   ),
+              // );
             } else {
               const url = await Linking.getInitialURL();
               await sleep(10);
