@@ -178,7 +178,7 @@ export const startAppInit = (): Effect => async (dispatch, getState) => {
     dispatch(LogActions.debug('successAppInit complete'));
 
     await sleep(500);
-    
+
     dispatch(LogActions.info('Initialized app successfully.'));
     dispatch(LogActions.debug(`Pin Lock Active: ${pinLockActive}`));
     dispatch(LogActions.debug(`Biometric Lock Active: ${biometricLockActive}`));
@@ -208,7 +208,7 @@ export const startAppInit = (): Effect => async (dispatch, getState) => {
     dispatch(LogActions.error(errorStr));
     await sleep(500);
     dispatch(showBlur(false));
-    RNBootSplash.hide();
+    // RNBootSplash.hide();
   }
 };
 
