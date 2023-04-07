@@ -1,7 +1,10 @@
 package com.bitpay.wallet;
 
+import com.braze.Braze;
 import com.braze.ui.inappmessage.BrazeInAppMessageManager;
 import com.facebook.react.ReactActivity;
+
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Build;
@@ -10,8 +13,18 @@ import android.view.View;
 import android.graphics.Color;
 import android.view.Window;
 import android.view.WindowManager;
+import android.util.Log;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.zoontek.rnbootsplash.RNBootSplash;
+
 public class MainActivity extends ReactActivity {
+  String TAG = "FOOB";
 
   /**
    * Returns the name of the main component registered from JavaScript. This is used to schedule
@@ -44,6 +57,23 @@ public class MainActivity extends ReactActivity {
         win.setStatusBarColor(Color.TRANSPARENT);
       }
       BrazeInAppMessageManager.getInstance().ensureSubscribedToInAppMessageEvents(MainActivity.this);
+
+      Context appCtx = this;
+
+      FirebaseMessaging.getInstance().getToken().addOnCompleteListener(new OnCompleteListener<String>() {
+        @Override
+        public void onComplete(@NonNull Task<String> task) {
+            if (!task.isSuccessful()) {
+              Log.d(TAG, "Failed get device token.");
+              Toast.makeText(MainActivity.this, "FAILED getToken()", Toast.LENGTH_SHORT).show();
+              return;
+            }
+
+            String token = task.getResult();
+            Log.d(TAG, "Success get device token: " + token);
+            Braze.getInstance(appCtx).setRegisteredPushToken(token);
+        }
+      });
   }
 
     public static void setWindowFlag(Activity activity, final int bits, boolean on) {
