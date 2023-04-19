@@ -1134,7 +1134,8 @@ const WalletDetails: React.FC<WalletDetailsScreenProps> = ({route}) => {
               ) : null}
 
               {Number(cryptoLockedBalance) > 0 ? (
-                <LockedBalanceContainer>
+                <LockedBalanceContainer
+                  onPress={() => setShowBalanceDetailsModal(true)}>
                   <HeadContainer>
                     <Description numberOfLines={1} ellipsizeMode={'tail'}>
                       {t('Total Locked Balance')}
