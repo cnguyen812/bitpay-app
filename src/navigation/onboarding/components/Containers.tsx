@@ -1,8 +1,8 @@
 import styled from 'styled-components/native';
 import {HEIGHT} from '../../../components/styled/Containers';
-import FastImage from 'react-native-fast-image';
+import { Image } from 'react-native';
 
-export const OnboardingImage = styled(FastImage)<{
+export const OnboardingImage = styled(Image)<{
   widthPct?: number;
   heightPct?: number;
 }>`

@@ -1,6 +1,6 @@
 import styled from 'styled-components/native';
-import FastImage from 'react-native-fast-image';
 import {BaseText} from '../../../../../components/styled/Text';
+import { Image } from 'react-native';
 
 export const RowDataContainer = styled.View`
   display: flex;
@@ -35,7 +35,7 @@ export const CryptoUnit = styled(BaseText)`
   padding-left: 5px;
 `;
 
-export const IconContainer = styled(FastImage)`
+export const IconContainer = styled(Image)`
   height: 40px;
   width: 40px;
 `;

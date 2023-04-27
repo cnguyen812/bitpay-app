@@ -2,7 +2,6 @@ import {DOSH_WHITELIST} from '@env';
 import axios from 'axios';
 import {t} from 'i18next';
 import BitPayIdApi from '../../api/bitpay';
-import FastImage from 'react-native-fast-image';
 import CardApi from '../../api/card';
 import {InitialUserData} from '../../api/user/user.types';
 import {sleep} from '../../utils/helper-methods';
@@ -295,11 +294,11 @@ export const startFetchVirtualCardImageUrls =
       dispatch(CardActions.successFetchVirtualImageUrls(urlsPayload));
 
       try {
-        const sources = urlsPayload.map(({virtualCardImage}) => {
-          return {uri: virtualCardImage};
-        });
+        // const sources = urlsPayload.map(({virtualCardImage}) => {
+        //   return {uri: virtualCardImage};
+        // });
 
-        FastImage.preload(sources);
+        // FastImage.preload(sources);
       } catch (err) {
         dispatch(LogActions.error('Failed to preload virtual card images.'));
         dispatch(LogActions.error(JSON.stringify(err)));

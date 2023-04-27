@@ -1,8 +1,7 @@
 import {useFocusEffect} from '@react-navigation/native';
 import React from 'react';
-import {Linking} from 'react-native';
+import {Image, Linking} from 'react-native';
 import Braze, {ContentCard} from 'react-native-appboy-sdk';
-import FastImage, {Source} from 'react-native-fast-image';
 import styled, {useTheme} from 'styled-components/native';
 import haptic from '../../../../../components/haptic-feedback/haptic';
 import {
@@ -78,7 +77,7 @@ const QuickLinksCard: React.FC<QuickLinksCardProps> = props => {
   const theme = useTheme();
   let title = '';
   let description = '';
-  let imageSource: Source | null = null;
+  let imageSource: any | null = null;
 
   if (
     isCaptionedContentCard(contentCard) ||
@@ -138,7 +137,7 @@ const QuickLinksCard: React.FC<QuickLinksCardProps> = props => {
       style={!theme.dark && BoxShadow}>
       {imageSource ? (
         <IconContainer>
-          <FastImage
+          <Image
             resizeMode={'contain'}
             style={{
               height: QUICK_LINK_ICON_HEIGHT,

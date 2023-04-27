@@ -262,6 +262,11 @@ const WalletStack = () => {
         <Wallet.Screen
           name={WalletScreens.UPDATE_KEY_OR_WALLET_NAME}
           component={UpdateKeyOrWalletName}
+          options={{
+            ...baseNavigatorOptions,
+            gestureEnabled: false,
+            animationEnabled: false,
+          }}
         />
         <Wallet.Screen
           name={WalletScreens.WALLET_DETAILS}

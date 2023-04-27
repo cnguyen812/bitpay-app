@@ -1,8 +1,8 @@
 import styled from 'styled-components/native';
 import {BaseText, H3} from '../../../../components/styled/Text';
-import FastImage from 'react-native-fast-image';
+import { Image } from 'react-native';
 
-export const BackgroundImage = styled(FastImage)`
+export const BackgroundImage = styled(Image)`
   width: 100%;
   height: 100%;
   margin-top: 10%;

@@ -630,11 +630,13 @@ export default () => {
               component={BitpayIdStack}
             />
             <Root.Screen
-              options={{
-                gestureEnabled: false,
-              }}
               name={RootStacks.WALLET}
               component={WalletStack}
+              options={{
+                ...baseNavigatorOptions,
+                gestureEnabled: false,
+                animationEnabled: false,
+              }}
             />
             <Root.Screen
               name={RootStacks.CARD_ACTIVATION}
@@ -660,6 +662,10 @@ export default () => {
             <Root.Screen
               name={RootStacks.GENERAL_SETTINGS}
               component={GeneralSettingsStack}
+              options={{
+                gestureEnabled: false,
+                animationEnabled: false,
+              }}
             />
             <Root.Screen name={RootStacks.CONTACTS} component={ContactsStack} />
             <Root.Screen

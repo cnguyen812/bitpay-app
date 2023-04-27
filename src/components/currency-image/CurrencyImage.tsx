@@ -1,8 +1,7 @@
 // renders svg if supported currency or cached png if custom token
 import React, {ReactElement, useMemo} from 'react';
-import {StyleSheet} from 'react-native';
+import {Image, StyleSheet} from 'react-native';
 import {ImageRequireSource} from 'react-native';
-import FastImage from 'react-native-fast-image';
 import styled from 'styled-components/native';
 import DefaultImage from '../../../assets/img/currencies/default.svg';
 import CoinbaseSvg from '../../../assets/img/logos/coinbase.svg';
@@ -49,20 +48,19 @@ export const CurrencyImage: React.VFC<CurrencyImageProps> = ({
       badgeSrc || badgeUri ? (
         <BadgeContainer>
           {badgeSrc ? (
-            <FastImage
+            <Image
               style={styles.badge}
               source={badgeSrc}
-              resizeMode={FastImage.resizeMode.contain}
+              resizeMode={'contain'}
             />
           ) : badgeUri ? (
             typeof badgeUri === 'string' ? (
-              <FastImage
+              <Image
                 style={styles.badge}
                 source={{
                   uri: badgeUri,
-                  priority: FastImage.priority.normal,
                 }}
-                resizeMode={FastImage.resizeMode.contain}
+                resizeMode={'contain'}
               />
             ) : (
               badgeUri(styles.badge)
@@ -78,10 +76,10 @@ export const CurrencyImage: React.VFC<CurrencyImageProps> = ({
       {!img && !imgSrc ? (
         <DefaultImage {...style} />
       ) : imgSrc ? (
-        <FastImage
+        <Image
           style={style}
           source={imgSrc}
-          resizeMode={FastImage.resizeMode.cover}
+          resizeMode={'cover'}
         />
       ) : typeof img === 'string' ? (
         img === 'coinbase' ? (
@@ -89,13 +87,12 @@ export const CurrencyImage: React.VFC<CurrencyImageProps> = ({
         ) : img === 'contact' ? (
           <ProfileIcon size={20} />
         ) : (
-          <FastImage
+          <Image
             style={style}
             source={{
               uri: img,
-              priority: FastImage.priority.normal,
             }}
-            resizeMode={FastImage.resizeMode.contain}
+            resizeMode={'contain'}
           />
         )
       ) : (

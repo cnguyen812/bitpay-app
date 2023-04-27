@@ -14,11 +14,10 @@ import {
   ItemNoteTouchableContainer,
   ItemTitleContainer,
 } from '../styled/WalletConnectContainers';
-import {Platform, ScrollView, View} from 'react-native';
+import {Image, Platform, ScrollView, View} from 'react-native';
 import _ from 'lodash';
 import Connections from '../components/Connections';
 import {useTranslation} from 'react-i18next';
-import FastImage from 'react-native-fast-image';
 import TrashIcon from '../../../../assets/img/wallet-connect/trash-icon.svg';
 import haptic from '../../../components/haptic-feedback/haptic';
 import {
@@ -113,7 +112,7 @@ const WalletConnectConnections = () => {
       <ItemContainer style={{minHeight: 20}}>
         <ItemTitleContainer>
           <IconContainer>
-            <FastImage
+            <Image
               source={{uri: peerIcon}}
               style={{width: 18, height: 18}}
             />

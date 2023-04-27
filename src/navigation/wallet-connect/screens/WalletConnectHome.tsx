@@ -18,8 +18,7 @@ import {
   ItemTouchableContainer,
   WalletConnectContainer,
 } from '../styled/WalletConnectContainers';
-import {FlatList, View} from 'react-native';
-import FastImage from 'react-native-fast-image';
+import {FlatList, Image, View} from 'react-native';
 import {sleep} from '../../../utils/helper-methods';
 import haptic from '../../../components/haptic-feedback/haptic';
 import {
@@ -392,7 +391,7 @@ const WalletConnectHome = () => {
             {peerIcon && peerName ? (
               <>
                 <IconContainer>
-                  <FastImage
+                  <Image
                     source={{uri: peerIcon}}
                     style={{width: 25, height: 25}}
                   />
@@ -451,7 +450,7 @@ const WalletConnectHome = () => {
                     peerUrl ? copyToClipboard(peerUrl, 'dappUri') : null
                   }>
                   <IconContainer>
-                    <FastImage
+                    <Image
                       source={{uri: peerIcon}}
                       style={{width: 18, height: 18}}
                     />

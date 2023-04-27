@@ -24,7 +24,7 @@
 
 [ RNBootSplash initWithStoryboard:@"BootSplash" rootView:self.window.rootViewController.view]; // <- initialization using the storyboard file name
 
-  [Appboy startWithApiKey:@"BRAZE_API_KEY_REPLACE_ME"
+  [Appboy startWithApiKey:@"b00832d4-1365-4841-bcd6-56570c651a2c"
        inApplication:application
        withLaunchOptions:launchOptions];
 
@@ -116,13 +116,5 @@
   [[AppsFlyerAttribution shared] continueUserActivity:userActivity restorationHandler:restorationHandler];
   return YES;
 } 
-/// This method controls whether the `concurrentRoot`feature of React18 is turned on or off.
-///
-/// @see: https://reactjs.org/blog/2022/03/29/react-v18.html
-/// @note: This requires to be rendering on Fabric (i.e. on the New Architecture).
-/// @return: `true` if the `concurrentRoot` feature is enabled. Otherwise, it returns `false`.
-- (BOOL)concurrentRootEnabled
-{
-  return true;
-}
+
 @end

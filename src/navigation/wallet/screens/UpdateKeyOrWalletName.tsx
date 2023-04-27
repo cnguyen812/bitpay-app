@@ -1,4 +1,4 @@
-import React, {useLayoutEffect} from 'react';
+import React, {useEffect, useLayoutEffect} from 'react';
 import {HeaderTitle} from '../../../components/styled/Text';
 import {useNavigation} from '@react-navigation/native';
 import styled from 'styled-components/native';
@@ -24,8 +24,8 @@ type UpdateKeyOrWalletNameScreenProps = StackScreenProps<
 >;
 
 const UpdateContainer = styled.View`
-  flex: 1;
-  padding: 0 ${ScreenGutter};
+  /* flex: 1;
+  padding: 0 ${ScreenGutter}; */
 `;
 
 const FormContainer = styled.View`
@@ -45,39 +45,37 @@ const UpdateKeyOrWalletName: React.FC<UpdateKeyOrWalletNameScreenProps> = ({
 }) => {
   const {t} = useTranslation();
   const navigation = useNavigation();
-  const dispatch = useAppDispatch();
+  // const dispatch = useAppDispatch();
   const {key, wallet, context} = route.params;
   const {walletName, walletId} = wallet || {};
-  useLayoutEffect(() => {
-    navigation.setOptions({
-      headerTitle: () => (
-        <HeaderTitle>
-          {t('Update Name', {context: titleCasing(context)})}
-        </HeaderTitle>
-      ),
-    });
-  }, [navigation, t, context]);
+  // navigation.setOptions({
+  //       headerTitle: () => (
+  //         <HeaderTitle>
+  //           {t('Update Name', {context: titleCasing(context)})}
+  //         </HeaderTitle>
+  //       ),
+  //     });
 
-  const {
-    control,
-    handleSubmit,
-    formState: {errors},
-  } = useForm<{name: string}>({resolver: yupResolver(schema)});
+  // const {
+  //   control,
+  //   handleSubmit,
+  //   formState: {errors},
+  // } = useForm<{name: string}>({resolver: yupResolver(schema)});
 
-  const placeholder = context === 'key' ? key.keyName : walletName;
+  // const placeholder = context === 'key' ? key.keyName : walletName;
 
-  const updateName = ({name}: {name: string}) => {
-    if (context === 'key') {
-      dispatch(updateKeyName({keyId: key.id, name}));
-    } else {
-      walletId && dispatch(updateWalletName({keyId: key.id, walletId, name}));
-    }
-    navigation.goBack();
-  };
+  // const updateName = ({name}: {name: string}) => {
+  //   if (context === 'key') {
+  //     dispatch(updateKeyName({keyId: key.id, name}));
+  //   } else {
+  //     walletId && dispatch(updateWalletName({keyId: key.id, walletId, name}));
+  //   }
+  //   navigation.goBack();
+  // };
 
   return (
     <UpdateContainer>
-      <FormContainer>
+      {/* <FormContainer>
         <Controller
           control={control}
           render={({field: {onChange, onBlur, value}}) => (
@@ -99,7 +97,7 @@ const UpdateKeyOrWalletName: React.FC<UpdateKeyOrWalletNameScreenProps> = ({
         <Button onPress={handleSubmit(updateName)} buttonStyle={'primary'}>
           {t('Update')}
         </Button>
-      </ButtonContainer>
+      </ButtonContainer> */}
     </UpdateContainer>
   );
 };

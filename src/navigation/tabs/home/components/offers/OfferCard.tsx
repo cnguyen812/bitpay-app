@@ -1,8 +1,7 @@
 import {useFocusEffect} from '@react-navigation/native';
 import React from 'react';
-import {Linking} from 'react-native';
+import {Image, Linking} from 'react-native';
 import Braze, {ContentCard} from 'react-native-appboy-sdk';
-import FastImage, {Source} from 'react-native-fast-image';
 import haptic from '../../../../../components/haptic-feedback/haptic';
 import {
   isCaptionedContentCard,
@@ -28,7 +27,7 @@ const OfferCard: React.FC<OfferCardProps> = props => {
   const dispatch = useAppDispatch();
   const urlEventHandler = useUrlEventHandler();
   let description = '';
-  let imageSource: Source | null = null;
+  let imageSource: any | null = null;
 
   if (
     isCaptionedContentCard(contentCard) ||
@@ -92,7 +91,7 @@ const OfferCard: React.FC<OfferCardProps> = props => {
     <LinkCard
       image={() =>
         imageSource && (
-          <FastImage
+          <Image
             style={{
               height: OFFER_HEIGHT,
               width: OFFER_WIDTH,

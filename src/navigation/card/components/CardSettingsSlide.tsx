@@ -1,11 +1,11 @@
 import React, {useState} from 'react';
-import FastImage from 'react-native-fast-image';
 import styled from 'styled-components/native';
 import {CARD_HEIGHT, CARD_WIDTH} from '../../../constants/config.card';
 import {Card} from '../../../store/card/card.models';
 import {LogActions} from '../../../store/log';
 import {useAppDispatch, useAppSelector} from '../../../utils/hooks';
 import CardBack from './CardBack';
+import { Image } from 'react-native';
 
 interface SettingsSlideProps {
   card: Card;
@@ -25,7 +25,7 @@ const PlaceholderContainer = styled.View`
   left: 0;
 `;
 
-const StyledImage = styled(FastImage)`
+const StyledImage = styled(Image)`
   height: ${CARD_HEIGHT}px;
   width: ${CARD_WIDTH}px;
   border-radius: 10px;

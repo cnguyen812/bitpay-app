@@ -577,7 +577,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 3F22DF1C884C608E7099039C /* Pods-BitPayApp.debug.xcconfig */;
 			buildSettings = {
-				ALLOWED_URL_PREFIXES = "ALLOWED-URL-PREFIXES-REPLACE-ME";
+				ALLOWED_URL_PREFIXES = "https://bitpay.com,https://test.bitpay.com,https://staging.bitpay.com,https://bws.bitpay.com,https://www.coinbase.com,https://api.coinbase.com,https://api.1inch.io/v4.0/,https://api.coingecko.com/api/v3/simple/token_price/,https://checkout.simplexcc.com,https://sandbox.test-simplexcc.com,https://api.testwyre.com,https://api.sendwyre.com,https://api.zenledger.io/bitpay/wallets/,https://rest.iad-05.braze.com,https://sdk.iad-05.braze.com,https://cdn-settings.segment.com,https://api.segment.io,https://cloudflare-eth.com/,https://polygon-rpc.com/,https://matic-mumbai.chainstacklabs.com,";
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = "$(inherited)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = NO;
@@ -615,7 +615,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 780EA24A31E2DB5EB6F58453 /* Pods-BitPayApp.release.xcconfig */;
 			buildSettings = {
-				ALLOWED_URL_PREFIXES = "ALLOWED-URL-PREFIXES-REPLACE-ME";
+				ALLOWED_URL_PREFIXES = "https://bitpay.com,https://test.bitpay.com,https://staging.bitpay.com,https://bws.bitpay.com,https://www.coinbase.com,https://api.coinbase.com,https://api.1inch.io/v4.0/,https://api.coingecko.com/api/v3/simple/token_price/,https://checkout.simplexcc.com,https://sandbox.test-simplexcc.com,https://api.testwyre.com,https://api.sendwyre.com,https://api.zenledger.io/bitpay/wallets/,https://rest.iad-05.braze.com,https://sdk.iad-05.braze.com,https://cdn-settings.segment.com,https://api.segment.io,https://cloudflare-eth.com/,https://polygon-rpc.com/,https://matic-mumbai.chainstacklabs.com,";
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = "$(inherited)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = NO;
@@ -703,6 +703,14 @@
 				LIBRARY_SEARCH_PATHS = "$(SDKROOT)/usr/lib/swift\"$(inherited)\"";
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
+				OTHER_CFLAGS = (
+					"$(inherited)",
+					"-DRN_FABRIC_ENABLED",
+				);
+				OTHER_CPLUSPLUSFLAGS = (
+					"$(inherited)",
+					"-DRN_FABRIC_ENABLED",
+				);
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 			};
@@ -758,6 +766,14 @@
 				);
 				LIBRARY_SEARCH_PATHS = "$(SDKROOT)/usr/lib/swift\"$(inherited)\"";
 				MTL_ENABLE_DEBUG_INFO = NO;
+				OTHER_CFLAGS = (
+					"$(inherited)",
+					"-DRN_FABRIC_ENABLED",
+				);
+				OTHER_CPLUSPLUSFLAGS = (
+					"$(inherited)",
+					"-DRN_FABRIC_ENABLED",
+				);
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
