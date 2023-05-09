@@ -32,12 +32,12 @@ public class MainActivity extends ReactActivity {
    */
   @Override
   protected ReactActivityDelegate createReactActivityDelegate() {
-    return new DefaultReactActivityDelegate(
-        this,
-        getMainComponentName(),
-        // If you opted-in for the New Architecture, we enable the Fabric Renderer.
-        DefaultNewArchitectureEntryPoint.getFabricEnabled();
-        );
+      return new DefaultReactActivityDelegate(
+          this,
+          getMainComponentName(),
+          // If you opted-in for the New Architecture, we enable the Fabric Renderer.
+          DefaultNewArchitectureEntryPoint.getFabricEnabled()
+      );
   }
 
   protected void onCreate(Bundle savedInstanceState) {
