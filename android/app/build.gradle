@@ -1,6 +1,6 @@
 apply plugin: "com.android.application"
 apply plugin: "com.facebook.react"
-apply plugin: 'com.google.gms.google-services'
+
 import com.android.build.OutputFile
 
 /**
@@ -93,15 +93,15 @@ android {
 
     compileSdkVersion rootProject.ext.compileSdkVersion
 
-    namespace "com.bitpay.wallet"
+    namespace "com.awesomeproject"
     defaultConfig {
-        applicationId "com.bitpay.wallet"
+        applicationId "com.awesomeproject"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 91212092
-        versionName "14.11.2"
-        missingDimensionStrategy 'react-native-camera', 'mlkit'
+        versionCode 1
+        versionName "1.0"
     }
+
     splits {
         abi {
             reset()
@@ -117,14 +117,6 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
-        release {
-            if (project.hasProperty('APP_UPLOAD_STORE_FILE')) {
-                storeFile file(APP_UPLOAD_STORE_FILE)
-                storePassword APP_UPLOAD_STORE_PASSWORD
-                keyAlias APP_UPLOAD_KEY_ALIAS
-                keyPassword APP_UPLOAD_KEY_PASSWORD
-            }
-        }
     }
     buildTypes {
         debug {
@@ -133,7 +125,7 @@ android {
         release {
             // Caution! In production, you need to generate your own keystore file.
             // see https://reactnative.dev/docs/signed-apk-android.
-            signingConfig signingConfigs.release
+            signingConfig signingConfigs.debug
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
@@ -159,12 +151,8 @@ android {
 dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
-    implementation platform('com.google.firebase:firebase-bom:29.1.0')
-    implementation "com.google.firebase:firebase-core"
-    implementation "com.google.firebase:firebase-messaging"
 
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.0.0")
-    implementation("androidx.core:core-splashscreen:1.0.0")
 
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}")
     debugImplementation("com.facebook.flipper:flipper-network-plugin:${FLIPPER_VERSION}") {
@@ -177,20 +165,6 @@ dependencies {
     } else {
         implementation jscFlavor
     }
-
-    // Dosh
-    implementation('com.dosh:poweredby:2.8.0') {
-      exclude group:'com.squareup.okhttp3', module:'okhttp'
-    }
-
-    // AppsFlyer
-    implementation project(':react-native-appsflyer')
-    // Dosh SDK requires updated okhttp version
-    // If React Native updates their version, this can be removed
-    implementation "com.squareup.okhttp3:okhttp:4.8.0"
-    implementation "com.squareup.okhttp3:okhttp-urlconnection:4.8.0"
-    implementation 'com.google.android.gms:play-services-tapandpay:18.2.0'
 }
 
 apply from: file("../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesAppBuildGradle(project)
-apply plugin: 'com.google.android.gms.strict-version-matcher-plugin'
