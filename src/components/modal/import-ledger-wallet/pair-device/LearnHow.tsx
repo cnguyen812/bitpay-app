@@ -6,7 +6,7 @@ import {
   DescriptionRow,
   Header,
   Wrapper,
-} from '../connect-ledger.styled';
+} from '../import-ledger-wallet.styled';
 import {Action, NeutralSlate, SlateDark} from '../../../../styles/colors';
 
 interface Props {

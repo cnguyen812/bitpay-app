@@ -7,7 +7,7 @@ import {
   Header,
   IconRow,
   Wrapper,
-} from '../connect-ledger.styled';
+} from '../import-ledger-wallet.styled';
 
 interface Props {
   onLearnHow: () => void;

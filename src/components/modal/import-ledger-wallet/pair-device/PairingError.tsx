@@ -1,4 +1,4 @@
-import {H3, Paragraph} from '../../../../components/styled/Text';
+import {H3, Paragraph} from '../../../styled/Text';
 import {
   ViaBluetoothButton,
   ViaUsbButton,
@@ -8,7 +8,7 @@ import {
   DescriptionRow,
   Header,
   Wrapper,
-} from '../connect-ledger.styled';
+} from '../import-ledger-wallet.styled';
 
 interface Props {
   error: string;

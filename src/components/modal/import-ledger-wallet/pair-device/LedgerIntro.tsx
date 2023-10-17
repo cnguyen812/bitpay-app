@@ -6,7 +6,7 @@ import ConnectToLedgerSvg from '../../../../../assets/img/connect-to-ledger.svg'
 import {H3, Paragraph} from '../../../styled/Text';
 import {ActiveOpacity} from '../../../styled/Containers';
 import {useMount} from '../../../../utils/hooks';
-import {ActionsRow, DescriptionRow, Header} from '../connect-ledger.styled';
+import {ActionsRow, DescriptionRow, Header} from '../import-ledger-wallet.styled';
 import {
   ViaBluetoothButton,
   ViaUsbButton,

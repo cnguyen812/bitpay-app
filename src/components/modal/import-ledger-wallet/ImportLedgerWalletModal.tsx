@@ -17,7 +17,7 @@ import {
   quitLedgerApp,
 } from './utils';
 
-export const ConnectLedgerNanoXModal = () => {
+export const ImportLedgerWalletModal = () => {
   const dispatch = useAppDispatch();
   const isVisible = useAppSelector(({APP}) => APP.isImportLedgerModalVisible);
   const [transport, setTransport] = useState<Transport | null>(null);

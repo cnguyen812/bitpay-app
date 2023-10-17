@@ -5,8 +5,8 @@ import Transport from '@ledgerhq/hw-transport';
 import React, {useRef, useState} from 'react';
 import styled from 'styled-components/native';
 import BtcLogoSvg from '../../../../../assets/img/currencies/btc.svg';
-import Checkbox from '../../../../components/checkbox/Checkbox';
-import {AdvancedOptionsContainer} from '../../../../components/styled/Containers';
+import Checkbox from '../../../checkbox/Checkbox';
+import {AdvancedOptionsContainer} from '../../../styled/Containers';
 import {Network} from '../../../../constants';
 import {startImportFromHardwareWallet} from '../../../../store/wallet/effects';
 import {Wallet} from '../../../../store/wallet/wallet.models';
@@ -20,7 +20,7 @@ import {
   DescriptionRow,
   Header,
   Wrapper,
-} from '../connect-ledger.styled';
+} from '../import-ledger-wallet.styled';
 import {
   SupportedLedgerAppNames,
   getCurrentLedgerAppInfo,

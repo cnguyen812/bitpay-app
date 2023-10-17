@@ -8,7 +8,7 @@ import {
   DescriptionRow,
   Header,
   Wrapper,
-} from '../connect-ledger.styled';
+} from '../import-ledger-wallet.styled';
 import {Wallet} from '../../../../store/wallet/wallet.models';
 
 interface Props {

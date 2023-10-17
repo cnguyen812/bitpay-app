@@ -119,7 +119,7 @@ import BillStack, {
 import InAppNotification from './components/modal/in-app-notification/InAppNotification';
 import RNBootSplash from 'react-native-bootsplash';
 import {showBlur} from './store/app/app.actions';
-import {ConnectLedgerNanoXModal} from './components/modal/connect-ledger/ConnectLedgerNanoXModal';
+import {ImportLedgerWalletModal} from './components/modal/import-ledger-wallet/ImportLedgerWalletModal';
 
 // ROOT NAVIGATION CONFIG
 export type RootStackParamList = {
@@ -588,7 +588,7 @@ export default () => {
           <BlurContainer />
           <PinModal />
           <BiometricModal />
-          <ConnectLedgerNanoXModal />
+          <ImportLedgerWalletModal />
         </NavigationContainer>
       </ThemeProvider>
     </SafeAreaProvider>
