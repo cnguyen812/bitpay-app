@@ -52,6 +52,9 @@ export interface Key {
   keyName?: string;
   hideKeyBalance: boolean;
   isReadOnly: boolean;
+
+  // CLIENT ONLY
+  hardwareSource?: 'ledger'; // only ledger supported currently
 }
 
 export interface Wallet extends WalletObj, API {}
@@ -114,6 +117,13 @@ export interface WalletObj {
   hideWallet?: boolean;
   hideBalance?: boolean;
   network: Network;
+  isHardwareWallet?: boolean;
+  hardwareData?: {
+    /**
+     * Each wallet imported from a hardware device maps to a specific account path for the wallet's xPubKey
+     */
+    accountPath?: string;
+  };
 }
 
 export interface KeyOptions {
@@ -326,6 +336,11 @@ export interface TransactionProposal {
   requiredRejections: number;
   raw?: string;
   txid?: string;
+  inputPaths: Array<string | null>;
+  changeAddress: {
+    path: string;
+  };
+  network: Network;
 }
 
 export interface ProposalErrorHandlerProps {

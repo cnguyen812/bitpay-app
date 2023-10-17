@@ -105,6 +105,8 @@ export const buildWalletObj = (
     img,
     walletName,
     pendingTxps = [],
+    isHardwareWallet = false,
+    hardwareData = {},
   }: Credentials & {
     balance?: WalletBalance;
     tokens?: any;
@@ -115,6 +117,10 @@ export const buildWalletObj = (
     currencyName: string;
     img: any;
     pendingTxps: TransactionProposal[];
+    isHardwareWallet?: boolean;
+    hardwareData?: {
+      accountPath?: string;
+    };
   },
   tokenOpts?: {[key in string]: Token},
 ): WalletObj => {
@@ -144,6 +150,8 @@ export const buildWalletObj = (
     hideWallet,
     hideBalance,
     pendingTxps,
+    isHardwareWallet,
+    hardwareData,
   };
 };
 

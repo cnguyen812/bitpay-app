@@ -5,6 +5,7 @@ import React from 'react';
 import {useState} from 'react';
 import {PermissionsAndroid} from 'react-native';
 import {IS_ANDROID} from '../../../../constants';
+import {LISTEN_TIMEOUT, OPEN_TIMEOUT} from '../../../../constants/config';
 import {useAppDispatch} from '../../../../utils/hooks';
 import {BleError} from 'react-native-ble-plx';
 import {LedgerIntro} from './LedgerIntro';
@@ -31,16 +32,6 @@ const isBleError = (e: any): e is BleError => {
 const isError = (e: any): e is Error => {
   return e instanceof Error;
 };
-
-/**
- * How long to wait to connect to a discovered device.
- */
-const OPEN_TIMEOUT = 3000;
-
-/**
- * How long to wait to find a device.
- */
-const LISTEN_TIMEOUT = 5000;
 
 export const PairDevice: React.FC<Props> = props => {
   const dispatch = useAppDispatch();
