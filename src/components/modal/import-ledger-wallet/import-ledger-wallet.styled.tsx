@@ -1,7 +1,7 @@
 import styled from 'styled-components/native';
 
 export const Wrapper = styled.View`
-  min-height: 320px;
+  min-height: 405px;
 `;
 
 export const Header = styled.View`
@@ -11,6 +11,7 @@ export const Header = styled.View`
 `;
 
 export const DescriptionRow = styled.View`
+  align-items: center;
   flex-grow: 1;
   padding-top: 12px;
 `;

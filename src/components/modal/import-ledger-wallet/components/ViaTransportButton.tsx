@@ -1,11 +1,11 @@
+import styled, {useTheme} from 'styled-components/native';
 import {TouchableOpacity, TouchableOpacityProps} from 'react-native';
 import {BaseButtonProps} from 'react-native-gesture-handler';
-import styled from 'styled-components/native';
+import {ActiveOpacity} from '../../../../components/styled/Containers';
+import {Action, White} from '../../../../styles/colors';
 import {BUTTON_HEIGHT, BUTTON_RADIUS} from '../../../button/Button';
 import {BaseText} from '../../../styled/Text';
-import {Action, White} from '../../../../styles/colors';
 import {BluetoothLogo, UsbLogo} from './Logos';
-import {useTheme} from 'styled-components/native';
 
 const ButtonIcon = styled.View`
   margin-bottom: 2px;
@@ -44,7 +44,10 @@ export const ViaBluetoothButton: React.FC<ViaTransportButtonProps> = props => {
   const logoFill = secondary ? Action : White;
 
   return (
-    <ConnectButton secondary={secondary} {...rest}>
+    <ConnectButton
+      activeOpacity={ActiveOpacity}
+      secondary={secondary}
+      {...rest}>
       <ButtonIcon>
         <BluetoothLogo fill={logoFill} />
       </ButtonIcon>
@@ -60,7 +63,10 @@ export const ViaUsbButton: React.FC<ViaTransportButtonProps> = props => {
   const logoFill = theme.dark || !secondary ? White : Action;
 
   return (
-    <ConnectButton secondary={secondary} {...rest}>
+    <ConnectButton
+      activeOpacity={ActiveOpacity}
+      secondary={secondary}
+      {...rest}>
       <ButtonIcon>
         <UsbLogo fill={logoFill} />
       </ButtonIcon>

@@ -4,9 +4,12 @@ import React, {useState} from 'react';
 import styled from 'styled-components/native';
 import ConnectToLedgerSvg from '../../../../../assets/img/connect-to-ledger.svg';
 import {H3, Paragraph} from '../../../styled/Text';
-import {ActiveOpacity} from '../../../styled/Containers';
 import {useMount} from '../../../../utils/hooks';
-import {ActionsRow, DescriptionRow, Header} from '../import-ledger-wallet.styled';
+import {
+  ActionsRow,
+  DescriptionRow,
+  Header,
+} from '../import-ledger-wallet.styled';
 import {
   ViaBluetoothButton,
   ViaUsbButton,
@@ -66,17 +69,12 @@ export const LedgerIntro: React.FC<Props> = props => {
       {supportedTypes ? (
         <ActionsRow>
           {supportedTypes.ble ? (
-            <ViaBluetoothButton
-              activeOpacity={ActiveOpacity}
-              onPress={props.onConnectBle}>
+            <ViaBluetoothButton onPress={props.onConnectBle}>
               Connect via Bluetooth
             </ViaBluetoothButton>
           ) : null}
           {supportedTypes.hid ? (
-            <ViaUsbButton
-              secondary={true}
-              activeOpacity={ActiveOpacity}
-              onPress={props.onConnectHid}>
+            <ViaUsbButton secondary={true} onPress={props.onConnectHid}>
               Connect via USB
             </ViaUsbButton>
           ) : null}

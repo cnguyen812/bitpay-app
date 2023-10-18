@@ -33,7 +33,6 @@ export const NameYourWallet: React.FC<Props> = props => {
 
       <DescriptionRow
         style={{
-          alignItems: 'center',
           flexGrow: 0,
         }}>
         <Paragraph>Give your wallet a name.</Paragraph>
