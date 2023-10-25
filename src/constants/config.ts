@@ -90,4 +90,4 @@ export const OPEN_TIMEOUT = 3000;
 /**
  * How long to wait to find a device.
  */
-export const LISTEN_TIMEOUT = 5000;
+export const LISTEN_TIMEOUT = 10000;
