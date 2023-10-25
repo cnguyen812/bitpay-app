@@ -43,6 +43,8 @@ const allowedUrlPrefixes = [
   'https://cloudflare-eth.com/',
   'https://polygon-rpc.com/',
   'https://matic-mumbai.chainstacklabs.com',
+  'https://mempool.space/api',
+  'https://mempool.space/testnet/api',
 ].concat(developmentOnlyAllowedUrlPrefixes);
 
 const allowedUrlPrefixString = allowedUrlPrefixes.join(',');

@@ -10,7 +10,7 @@ import {
 const IconWrapper = styled.View`
   flex-direction: row;
   justify-content: center;
-  padding-bottom: 4;
+  padding-bottom: 4px;
   padding-top: 28px;
 `;
 
