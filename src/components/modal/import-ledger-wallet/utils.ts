@@ -4,6 +4,8 @@ import {
   StatusCodes,
 } from '@ledgerhq/errors';
 import Transport from '@ledgerhq/hw-transport';
+import {Permission, PermissionsAndroid} from 'react-native';
+import {IS_ANDROID} from '../../../constants';
 
 type TransportStatusError = Error & {
   statusCode: string;
@@ -123,4 +125,40 @@ export const handleLedgerError = (err: any) => {
   } else {
     console.log('CATCH unknown', JSON.stringify(err));
   }
+};
+
+const REQUIRED_PERMISSIONS_BLE_ANDROID = [
+  PermissionsAndroid.PERMISSIONS.BLUETOOTH_CONNECT,
+  PermissionsAndroid.PERMISSIONS.BLUETOOTH_SCAN,
+  PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+];
+
+/**
+ * Check bluetooth permissions
+ */
+export const checkPermissionsBLE = async (): Promise<{
+  isAuthorized: boolean;
+  missingPermissions?: Permission[];
+}> => {
+  let isAuthorized = true;
+  let missingPermissions: Permission[] = [];
+
+  if (IS_ANDROID) {
+    const permissions = await PermissionsAndroid.requestMultiple(
+      REQUIRED_PERMISSIONS_BLE_ANDROID,
+    );
+
+    isAuthorized = REQUIRED_PERMISSIONS_BLE_ANDROID.every(
+      p => permissions[p] === 'granted',
+    );
+
+    missingPermissions = REQUIRED_PERMISSIONS_BLE_ANDROID.filter(
+      p => permissions[p] !== 'granted',
+    );
+  }
+
+  return {
+    isAuthorized,
+    missingPermissions,
+  };
 };

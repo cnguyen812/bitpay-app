@@ -3,6 +3,7 @@ import {
   KeyMethods,
   KeyOptions,
   KeyProperties,
+  SupportedHardwareSource,
   Wallet,
 } from '../../wallet.models';
 import {Effect, storage} from '../../../index';
@@ -916,7 +917,7 @@ export const startImportFromHardwareWallet =
     accountPath,
     coin,
   }: {
-    hardwareSource: 'ledger';
+    hardwareSource: SupportedHardwareSource;
     xPubKey: string;
     accountPath: string;
     coin: 'btc' | 'eth';
@@ -951,7 +952,7 @@ export const startImportFromHardwareWallet =
     const credentials = credentialsFromExtendedPublicKey(
       coin,
       xPubKey,
-      0,
+      accountNumber,
       BwcConstants.DERIVATION_STRATEGIES.BIP44,
     );
     const bwcClient = BWC.getClient(credentials);
@@ -1065,6 +1066,24 @@ export const startImportFromHardwareWallet =
     await dispatch(startUpdateAllWalletStatusForKey({key, force: true}));
     await sleep(1000);
     await dispatch(updatePortfolioBalance());
+
+    // since we are importing a wallet that was created outside of BWS,
+    // we need to do an initial scan to find any used addresses
+    bwcClient.startScan(
+      {
+        includeCopayerBranches: true,
+      },
+      (err: any) => {
+        const errMsg = err instanceof Error ? err.message : JSON.stringify(err);
+
+        dispatch(
+          LogActions.error(
+            'An error occurred while starting an address scan:',
+            errMsg,
+          ),
+        );
+      },
+    );
 
     dispatch(
       setHomeCarouselConfig({

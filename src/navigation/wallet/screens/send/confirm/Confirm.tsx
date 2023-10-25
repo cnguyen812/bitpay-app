@@ -1,9 +1,21 @@
-import React, {useState, useEffect, useCallback, useLayoutEffect} from 'react';
+import Transport from '@ledgerhq/hw-transport';
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useLayoutEffect,
+  useRef,
+} from 'react';
 import {useNavigation, useRoute, CommonActions} from '@react-navigation/native';
 import {RouteProp, StackActions} from '@react-navigation/core';
 import {WalletStackParamList} from '../../../WalletStack';
-import {useAppDispatch, useAppSelector} from '../../../../../utils/hooks';
 import {
+  useAppDispatch,
+  useAppSelector,
+  useMount,
+} from '../../../../../utils/hooks';
+import {
+  Key,
   Recipient,
   TransactionProposal,
   TxDetails,
@@ -84,6 +96,10 @@ import {Analytics} from '../../../../../store/analytics/analytics.effects';
 import SendingToERC20Warning from '../../../components/SendingToERC20Warning';
 import {HIGH_FEE_LIMIT} from '../../../../../constants/wallet';
 import WarningSvg from '../../../../../../assets/img/warning.svg';
+import {
+  ConfirmHardwareWalletModal,
+  SimpleConfirmPaymentState,
+} from '../../../../../components/modal/confirm-hardware-wallet/ConfirmHardwareWalletModal';
 
 const VerticalPadding = styled.View`
   padding: ${ScreenGutter} 0;
@@ -156,6 +172,12 @@ const Confirm = () => {
   const [showSendingERC20Modal, setShowSendingERC20Modal] = useState(true);
   const [showHighFeeWarningMessage, setShowHighFeeWarningMessage] =
     useState(false);
+  const [isConfirmHardwareWalletModalVisible, setConfirmHardwareWalletVisible] =
+    useState(false);
+  const [hardwareWalletTransport, setHardwareWalletTransport] =
+    useState<Transport | null>(null);
+  const [confirmHardwareState, setConfirmHardwareState] =
+    useState<SimpleConfirmPaymentState | null>(null);
 
   const {
     fee: _fee,
@@ -183,6 +205,7 @@ const Confirm = () => {
   const feeOptions = GetFeeOptions(chain);
   const {unitToSatoshi} =
     dispatch(GetPrecision(currencyAbbreviation, chain)) || {};
+
   useLayoutEffect(() => {
     navigation.setOptions({
       headerTitle: () => (
@@ -192,6 +215,18 @@ const Confirm = () => {
       ),
     });
   }, [navigation, speedup, t]);
+
+  useMount(() => {
+    return () => {
+      if (hardwareWalletTransport) {
+        try {
+          hardwareWalletTransport.close();
+        } catch (err) {
+          // swallow
+        }
+      }
+    };
+  });
 
   const isTxLevelAvailable = () => {
     const includedCurrencies = ['btc', 'eth', 'matic'];
@@ -312,6 +347,109 @@ const Confirm = () => {
     }
   };
 
+  const startSendingPayment = async ({
+    transport,
+  }: {transport?: Transport} = {}) => {
+    const isUsingHardwareWallet = !!transport;
+
+    try {
+      if (isUsingHardwareWallet) {
+        setConfirmHardwareState('sending');
+        await sleep(500);
+        await dispatch(
+          startSendPayment({txp, key, wallet, recipient, transport}),
+        );
+        setConfirmHardwareState('complete');
+        await sleep(1000);
+        setConfirmHardwareWalletVisible(false);
+      } else {
+        dispatch(startOnGoingProcessModal('SENDING_PAYMENT'));
+        await sleep(500);
+        await dispatch(
+          startSendPayment({txp, key, wallet, recipient, transport}),
+        );
+        dispatch(dismissOnGoingProcessModal());
+      }
+
+      dispatch(
+        Analytics.track('Sent Crypto', {
+          context: 'Confirm',
+          coin: currencyAbbreviation || '',
+        }),
+      );
+      await sleep(500);
+      setShowPaymentSentModal(true);
+    } catch (err) {
+      if (isUsingHardwareWallet) {
+        setConfirmHardwareWalletVisible(false);
+        setConfirmHardwareState(null);
+      }
+      dispatch(dismissOnGoingProcessModal());
+      await sleep(500);
+      setResetSwipeButton(true);
+      switch (err) {
+        case 'invalid password':
+          dispatch(showBottomNotificationModal(WrongPasswordError()));
+          break;
+        case 'password canceled':
+          break;
+        case 'biometric check failed':
+          setResetSwipeButton(true);
+          break;
+        default:
+          await showErrorMessage(
+            CustomErrorMessage({
+              errMsg: BWCErrorMessage(err),
+              title: t('Uh oh, something went wrong'),
+            }),
+          );
+      }
+    }
+  };
+
+  const onSwipeCompleteHardwareWallet = async (key: Key) => {
+    if (key.hardwareSource === 'ledger') {
+      if (hardwareWalletTransport) {
+        setConfirmHardwareState('sending');
+        setConfirmHardwareWalletVisible(true);
+        startSendingPayment({transport: hardwareWalletTransport});
+      } else {
+        setConfirmHardwareWalletVisible(true);
+      }
+    } else {
+      showErrorMessage(
+        CustomErrorMessage({
+          errMsg: 'Unsupported hardware wallet',
+          title: t('Uh oh, something went wrong'),
+        }),
+      );
+    }
+  };
+
+  // on hardware wallet disconnect, just clear the cached transport object
+  // errors will be thrown and caught as needed in their respective workflows
+  const disconnectFn = () => setHardwareWalletTransport(null);
+  const disconnectFnRef = useRef(disconnectFn);
+  disconnectFnRef.current = disconnectFn;
+
+  const onHardwareWalletPaired = (args: {transport: Transport}) => {
+    const {transport} = args;
+
+    transport.on('disconnect', disconnectFnRef.current);
+
+    setHardwareWalletTransport(transport);
+    setConfirmHardwareState('sending');
+    startSendingPayment({transport});
+  };
+
+  const onSwipeComplete = async () => {
+    if (key.hardwareSource) {
+      await onSwipeCompleteHardwareWallet(key);
+    } else {
+      await startSendingPayment();
+    }
+  };
+
   useEffect(() => {
     if (!resetSwipeButton) {
       return;
@@ -387,36 +525,37 @@ const Confirm = () => {
   }
 
   return (
-    <ConfirmContainer>
-      <ConfirmScrollView
-        extraScrollHeight={50}
-        contentContainerStyle={{paddingBottom: 50}}
-        keyboardShouldPersistTaps={'handled'}>
-        <DetailsListNoScroll keyboardShouldPersistTaps={'handled'}>
-          <Header>Summary</Header>
-          <SendingTo
-            recipient={recipientData}
-            recipientList={recipientListData}
-            hr
-          />
-          <Fee
-            onPress={
-              isTxLevelAvailable() && !selectInputs
-                ? () => setShowTransactionLevel(true)
-                : undefined
-            }
-            fee={fee}
-            feeOptions={feeOptions}
-            hr={!showHighFeeWarningMessage}
-          />
-          {showHighFeeWarningMessage ? (
-            <>
-              <Info>
-                <InfoTriangle />
-                <InfoHeader>
-                  <InfoImageContainer infoMargin={'0 8px 0 0'}>
-                    <WarningSvg />
-                  </InfoImageContainer>
+    <>
+      <ConfirmContainer>
+        <ConfirmScrollView
+          extraScrollHeight={50}
+          contentContainerStyle={{paddingBottom: 50}}
+          keyboardShouldPersistTaps={'handled'}>
+          <DetailsListNoScroll>
+            <Header>Summary</Header>
+            <SendingTo
+              recipient={recipientData}
+              recipientList={recipientListData}
+              hr
+            />
+            <Fee
+              onPress={
+                isTxLevelAvailable() && !selectInputs
+                  ? () => setShowTransactionLevel(true)
+                  : undefined
+              }
+              fee={fee}
+              feeOptions={feeOptions}
+              hr={!showHighFeeWarningMessage}
+            />
+            {showHighFeeWarningMessage ? (
+              <>
+                <Info>
+                  <InfoTriangle />
+                  <InfoHeader>
+                    <InfoImageContainer infoMargin={'0 8px 0 0'}>
+                      <WarningSvg />
+                    </InfoImageContainer>
 
                   <InfoTitle>
                     {t('Transaction fees are currently high')}
@@ -540,115 +679,97 @@ const Confirm = () => {
           />
         </DetailsListNoScroll>
 
-        <PaymentSent
-          isVisible={showPaymentSentModal}
-          title={
-            wallet.credentials.n > 1 ? t('Proposal created') : t('Payment Sent')
-          }
-          onCloseModal={async () => {
-            setShowPaymentSentModal(false);
-            if (recipient.type === 'coinbase') {
-              navigation.dispatch(
-                CommonActions.reset({
-                  index: 2,
-                  routes: [
-                    {
-                      name: 'Tabs',
-                      params: {screen: 'Home'},
-                    },
-                    {
-                      name: 'Coinbase',
-                      params: {
-                        screen: 'CoinbaseRoot',
-                      },
-                    },
-                  ],
-                }),
-              );
-            } else {
-              navigation.dispatch(StackActions.popToTop());
-              navigation.dispatch(
-                StackActions.replace('WalletDetails', {
-                  walletId: wallet!.id,
-                  key,
-                }),
-              );
-              await sleep(0);
+          <PaymentSent
+            isVisible={showPaymentSentModal}
+            title={
+              wallet.credentials.n > 1
+                ? t('Proposal created')
+                : t('Payment Sent')
+            }
+            onCloseModal={async () => {
               setShowPaymentSentModal(false);
-            }
-          }}
-        />
-        {isTxLevelAvailable() ? (
-          <TransactionLevel
-            feeLevel={fee.feeLevel}
-            wallet={wallet}
-            isVisible={showTransactionLevel}
-            onCloseModal={(selectedLevel, customFeePerKB) =>
-              onCloseTxLevelModal(selectedLevel, customFeePerKB)
-            }
-            customFeePerKB={
-              fee.feeLevel === 'custom' ? txp?.feePerKb : undefined
-            }
-            feePerSatByte={
-              fee.feeLevel === 'custom' && txp?.feePerKb
-                ? txp?.feePerKb / 1000
-                : undefined
-            }
-            isSpeedUpTx={speedup}
-          />
-        ) : null}
-      </ConfirmScrollView>
-      {wallet && IsERCToken(wallet.currencyAbbreviation, wallet.chain) ? (
-        <SendingToERC20Warning
-          isVisible={showSendingERC20Modal}
-          closeModal={() => {
-            setShowSendingERC20Modal(false);
-          }}
-          wallet={wallet}
-        />
-      ) : null}
-      <SwipeButton
-        title={speedup ? t('Speed Up') : t('Slide to send')}
-        forceReset={resetSwipeButton}
-        onSwipeComplete={async () => {
-          try {
-            dispatch(startOnGoingProcessModal('SENDING_PAYMENT'));
-            await sleep(500);
-            await dispatch(startSendPayment({txp, key, wallet, recipient}));
-            dispatch(dismissOnGoingProcessModal());
-            dispatch(
-              Analytics.track('Sent Crypto', {
-                context: 'Confirm',
-                coin: currencyAbbreviation || '',
-              }),
-            );
-            await sleep(500);
-            setShowPaymentSentModal(true);
-          } catch (err) {
-            dispatch(dismissOnGoingProcessModal());
-            await sleep(500);
-            setResetSwipeButton(true);
-            switch (err) {
-              case 'invalid password':
-                dispatch(showBottomNotificationModal(WrongPasswordError()));
-                break;
-              case 'password canceled':
-                break;
-              case 'biometric check failed':
-                setResetSwipeButton(true);
-                break;
-              default:
-                await showErrorMessage(
-                  CustomErrorMessage({
-                    errMsg: BWCErrorMessage(err),
-                    title: t('Uh oh, something went wrong'),
+              if (recipient.type === 'coinbase') {
+                navigation.dispatch(
+                  CommonActions.reset({
+                    index: 2,
+                    routes: [
+                      {
+                        name: 'Tabs',
+                        params: {screen: 'Home'},
+                      },
+                      {
+                        name: 'Coinbase',
+                        params: {
+                          screen: 'CoinbaseRoot',
+                        },
+                      },
+                    ],
                   }),
                 );
-            }
-          }
-        }}
-      />
-    </ConfirmContainer>
+              } else {
+                navigation.dispatch(StackActions.popToTop());
+                navigation.dispatch(
+                  StackActions.replace('WalletDetails', {
+                    walletId: wallet!.id,
+                    key,
+                  }),
+                );
+                await sleep(0);
+                setShowPaymentSentModal(false);
+              }
+            }}
+          />
+          {isTxLevelAvailable() ? (
+            <TransactionLevel
+              feeLevel={fee.feeLevel}
+              wallet={wallet}
+              isVisible={showTransactionLevel}
+              onCloseModal={(selectedLevel, customFeePerKB) =>
+                onCloseTxLevelModal(selectedLevel, customFeePerKB)
+              }
+              customFeePerKB={
+                fee.feeLevel === 'custom' ? txp?.feePerKb : undefined
+              }
+              feePerSatByte={
+                fee.feeLevel === 'custom' && txp?.feePerKb
+                  ? txp?.feePerKb / 1000
+                  : undefined
+              }
+              isSpeedUpTx={speedup}
+            />
+          ) : null}
+        </ConfirmScrollView>
+        {wallet && IsERCToken(wallet.currencyAbbreviation, wallet.chain) ? (
+          <SendingToERC20Warning
+            isVisible={showSendingERC20Modal}
+            closeModal={() => {
+              setShowSendingERC20Modal(false);
+            }}
+            wallet={wallet}
+          />
+        ) : null}
+        <SwipeButton
+          title={speedup ? t('Speed Up') : t('Slide to send')}
+          forceReset={resetSwipeButton}
+          onSwipeComplete={onSwipeComplete}
+        />
+      </ConfirmContainer>
+
+      {key.hardwareSource ? (
+        <ConfirmHardwareWalletModal
+          isVisible={isConfirmHardwareWalletModalVisible}
+          state={confirmHardwareState}
+          hardwareSource={key.hardwareSource}
+          transport={hardwareWalletTransport}
+          onBackdropPress={() => {
+            setConfirmHardwareWalletVisible(false);
+            setResetSwipeButton(true);
+            setConfirmHardwareState(null);
+          }}
+          onPaired={onHardwareWalletPaired}
+        />
+      ) : null}
+    </>
   );
 };
 
