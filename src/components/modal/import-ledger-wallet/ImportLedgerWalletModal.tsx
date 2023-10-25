@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {StatusCodes} from '@ledgerhq/errors';
 import Transport from '@ledgerhq/hw-transport';
 import TransportBLE from '@ledgerhq/react-native-hw-transport-ble';
@@ -22,20 +22,23 @@ export const ImportLedgerWalletModal = () => {
   const isVisible = useAppSelector(({APP}) => APP.isImportLedgerModalVisible);
   const [transport, setTransport] = useState<Transport | null>(null);
 
-  const onBackdropPress = () => {
-    dispatch(AppActions.importLedgerModalToggled(false));
-  };
+  // provide ref for disconnect function to avoid closure'd value
+  const isVisibleRef = useRef(isVisible);
+  isVisibleRef.current = isVisible;
 
-  /**
-   * If a transport disconnects, try to reconnect a few times.
-   */
-  const onDisconnect = async () => {
+  // provide ref for disconnect function to avoid closure'd value
+  const transportRef = useRef(transport);
+  transportRef.current = transport;
+
+  // We need a constant fn (no deps) that persists across renders that we can attach to AND detach from transports
+  const onDisconnect = useCallback(async () => {
     let retryAttempts = 2;
     let newTp: Transport | null = null;
 
-    const isBle = transport instanceof TransportBLE;
-    const isHid = transport instanceof TransportHID;
-    const shouldReconnect = isVisible && (isBle || isHid);
+    // avoid closure values
+    const isBle = transportRef.current instanceof TransportBLE;
+    const isHid = transportRef.current instanceof TransportHID;
+    const shouldReconnect = isVisibleRef.current && (isBle || isHid);
 
     if (!shouldReconnect) {
       setTransport(null);
@@ -58,13 +61,15 @@ export const ImportLedgerWalletModal = () => {
     }
 
     if (newTp) {
-      newTp.on('disconnect', onDisconnectRef.current);
+      newTp.on('disconnect', onDisconnect);
     }
 
     setTransport(newTp);
+  }, []);
+
+  const onBackdropPress = () => {
+    dispatch(AppActions.importLedgerModalToggled(false));
   };
-  const onDisconnectRef = useRef(onDisconnect);
-  onDisconnectRef.current = onDisconnect;
 
   const onPaired = async (openedTransport: Transport) => {
     /**
@@ -76,7 +81,7 @@ export const ImportLedgerWalletModal = () => {
      *
      * Whatever the reason, connection is no good so we clear the state so user is prompted to connect again.
      */
-    openedTransport.on('disconnect', onDisconnectRef.current);
+    openedTransport.on('disconnect', onDisconnect);
 
     setTransport(openedTransport);
   };
@@ -97,7 +102,7 @@ export const ImportLedgerWalletModal = () => {
 
       // Opening an app will cause a disconnect so replace the main listener
       // with a temp listener, then resolve once we handle the reconnect
-      transport.off('disconnect', onDisconnectRef.current);
+      transport.off('disconnect', onDisconnect);
 
       const tempCb = async () => {
         let newTp: Transport | null = null;
@@ -109,7 +114,7 @@ export const ImportLedgerWalletModal = () => {
         }
 
         if (newTp) {
-          newTp.on('disconnect', onDisconnectRef.current);
+          newTp.on('disconnect', onDisconnect);
 
           setTransport(newTp);
           resolve(res);
@@ -128,12 +133,12 @@ export const ImportLedgerWalletModal = () => {
         // if not OK, we won't his the disconnect logic so restore the handler and resolve
         if (statusCode !== StatusCodes.OK) {
           transport.off('disconnect', tempCb);
-          transport.on('disconnect', onDisconnectRef.current);
+          transport.on('disconnect', onDisconnect);
           resolve(res);
         }
       } catch (err) {
         transport.off('disconnect', tempCb);
-        transport.on('disconnect', onDisconnectRef.current);
+        transport.on('disconnect', onDisconnect);
         reject(err);
       }
     });
@@ -159,7 +164,7 @@ export const ImportLedgerWalletModal = () => {
 
       // Quitting an app will cause a disconnect so replace the main listener
       // with a temp listener, then resolve once we handle the reconnect.
-      transport.off('disconnect', onDisconnectRef.current);
+      transport.off('disconnect', onDisconnect);
 
       const cb = async () => {
         let newTp: Transport | null = null;
@@ -171,7 +176,7 @@ export const ImportLedgerWalletModal = () => {
         }
 
         if (newTp) {
-          newTp.on('disconnect', onDisconnectRef.current);
+          newTp.on('disconnect', onDisconnect);
 
           setTransport(newTp);
           resolve();
@@ -187,7 +192,7 @@ export const ImportLedgerWalletModal = () => {
         await quitLedgerApp(transport);
       } catch (err) {
         transport.off('disconnect', cb);
-        transport.on('disconnect', onDisconnectRef.current);
+        transport.on('disconnect', onDisconnect);
         reject(err);
       }
     });
