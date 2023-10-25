@@ -7,6 +7,8 @@ import Transport from '@ledgerhq/hw-transport';
 import {Permission, PermissionsAndroid} from 'react-native';
 import {IS_ANDROID} from '../../../constants';
 
+const UNKNOWN_ERROR = 0x650f;
+
 type TransportStatusError = Error & {
   statusCode: string;
   statusText: string;
@@ -100,30 +102,25 @@ export const isDisconnectedDeviceError = (
   return e?.name === 'DisconnectedDevice';
 };
 
-export const handleLedgerError = (err: any) => {
+export const getLedgerErrorMessage = (err: any) => {
   if (isLockedDeviceError(err)) {
-    console.log('CATCH LockedDeviceError', err.message);
+    return 'Unlock device to continue.';
   } else if (isTransportStatusError(err)) {
-    console.log(
-      'CATCH TransportStatusError',
-      err.message,
-      err.statusCode,
-      err.statusText,
-    );
-
-    if (Number(err.statusCode) === 0x650f) {
-      console.log('maybe app not open');
-    } else if (Number(err.statusCode) === 0x6e00) {
-      console.log(
-        'command not supported by app, make sure the correct app is open and app is up to date and ledger firmware is up to date',
-      );
+    if (Number(err.statusCode) === UNKNOWN_ERROR) {
+      return 'An unknown error was returned by the transport.';
+    } else if (Number(err.statusCode) === StatusCodes.CLA_NOT_SUPPORTED) {
+      return 'Command not supported, make sure the correct app is open and the app and Ledger firmware is up to date.';
+    } else if (Number(err.statusCode) === StatusCodes.USER_REFUSED_ON_DEVICE) {
+      return 'User refused command on device.';
     }
+
+    return err.message;
   } else if (isDisconnectedDeviceError(err)) {
-    console.log('CATCH DisconnectedDeviceError', err.message);
+    return 'Device was disconnected. Reconnect the device and try again.';
   } else if (err instanceof Error) {
-    console.log('CATCH ERROR', err.name, '|', err.message);
+    return err.message;
   } else {
-    console.log('CATCH unknown', JSON.stringify(err));
+    return `An unexpected error occurred: ${JSON.stringify(err)}`;
   }
 };
 

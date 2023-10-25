@@ -24,7 +24,7 @@ import {
 import {
   SupportedLedgerAppNames,
   getCurrentLedgerAppInfo,
-  handleLedgerError,
+  getLedgerErrorMessage,
 } from '../utils';
 
 interface Props {
@@ -218,8 +218,9 @@ export const SelectLedgerCurrency: React.FC<Props> = props => {
         props.onImported(newWallet);
       }
     } catch (err) {
-      handleLedgerError(err);
-      setError(err instanceof Error ? err.message : JSON.stringify(err));
+      const errMsg = getLedgerErrorMessage(err);
+
+      setError(errMsg);
     } finally {
       await sleep(1000);
     }
