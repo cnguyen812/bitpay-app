@@ -2,7 +2,7 @@ import {getCryptoCurrencyById} from '@ledgerhq/cryptoassets';
 import {StatusCodes} from '@ledgerhq/errors';
 import AppBtc from '@ledgerhq/hw-app-btc';
 import Transport from '@ledgerhq/hw-transport';
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import styled from 'styled-components/native';
 import BtcLogoSvg from '../../../../../assets/img/currencies/btc.svg';
 import Checkbox from '../../../checkbox/Checkbox';
@@ -91,8 +91,17 @@ const CURRENCIES = [
     coin: 'btc',
     label: 'Bitcoin',
     icon: <BtcLogoSvg height={35} width={35} />,
+    isTestnetSupported: true,
   },
 ];
+
+const TESTNET_SUPPORT_MAP = CURRENCIES.reduce<Record<string, boolean>>(
+  (acc, c) => {
+    acc[c.coin] = c.isTestnetSupported;
+    return acc;
+  },
+  {},
+);
 
 export const SelectLedgerCurrency: React.FC<Props> = props => {
   const dispatch = useAppDispatch();
@@ -105,6 +114,7 @@ export const SelectLedgerCurrency: React.FC<Props> = props => {
   const [isPromptOpenApp, setPromptOpenApp] = useState(false);
 
   const isLoading = continueButtonState === 'loading';
+  const isTestnetEnabled = TESTNET_SUPPORT_MAP[selectedCurrency] || false;
 
   // use the ref when doing any work that could cause disconnects and cause a new transport to be passed in mid-function
   const transportRef = useRef(props.transport);
@@ -265,6 +275,12 @@ export const SelectLedgerCurrency: React.FC<Props> = props => {
     setContinueButtonState(null);
   };
 
+  useEffect(() => {
+    if (!isTestnetEnabled) {
+      setUseTestnet(false);
+    }
+  }, [isTestnetEnabled]);
+
   return (
     <Wrapper>
       <Header>
@@ -322,7 +338,7 @@ export const SelectLedgerCurrency: React.FC<Props> = props => {
               </StretchColumn>
               <ShrinkColumn>
                 <Checkbox
-                  disabled={isLoading}
+                  disabled={isLoading || !isTestnetEnabled}
                   checked={useTestnet}
                   onPress={() => setUseTestnet(x => !x)}
                 />
