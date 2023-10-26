@@ -490,4 +490,5 @@ interface BitcoreTransactionOutputLike {
 export interface BitcoreTransactionLike {
   inputs: Array<BitcoreTransactionInputLike>;
   outputs: Array<BitcoreTransactionOutputLike>;
+  _changeIndex?: number;
 }

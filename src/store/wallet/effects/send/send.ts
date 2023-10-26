@@ -1347,11 +1347,12 @@ const createLedgerTransactionArgBtc = (
         }),
       );
 
+      const hasChange = typeof txpAsTx._changeIndex !== 'undefined';
+
       // optional BIP 32 path pointing to the path to the public key used to compute the change address
-      const changePath = `${accountPath}/${txp.changeAddress.path.replace(
-        'm/',
-        '',
-      )}`;
+      const changePath = hasChange
+        ? `${accountPath}/${txp.changeAddress.path.replace('m/', '')}`
+        : undefined;
 
       // undefined will default to SIGHASH_ALL.
       // BWC currently uses undefined when signing UTXO tx so we do the same here
