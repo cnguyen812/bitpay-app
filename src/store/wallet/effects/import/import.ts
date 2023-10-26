@@ -934,10 +934,12 @@ export const startImportFromHardwareWallet =
     const {WALLET} = getState();
     const accountNumber = 0;
 
-    // distinguishing hardware keys by keeping the readonly ID and appending the hardware source name
-    // TODO: need to see if there's a better way
-    const hwKeyId = `readonly/${hardwareSource}`;
-    const hwKeyName = 'My Ledger';
+    // distinguishing hardware keys by setting id = `readonly/${hardwareSource}`
+    const hwKeyId = buildKeyObj({
+      key: undefined,
+      wallets: [],
+      hardwareSource,
+    }).id;
 
     let key = Object.values(WALLET.keys).find(k => k.id === hwKeyId);
 
@@ -1026,6 +1028,15 @@ export const startImportFromHardwareWallet =
       ),
     );
 
+    if (!key) {
+      key = buildKeyObj({
+        key: undefined,
+        wallets: [],
+        backupComplete: true,
+        hardwareSource,
+      });
+    }
+
     const wallet = merge(
       bwcClient,
       buildWalletObj({
@@ -1033,7 +1044,7 @@ export const startImportFromHardwareWallet =
         currencyAbbreviation,
         currencyName,
         walletName,
-        keyId: hwKeyId,
+        keyId: key.id,
         isHardwareWallet: true,
         hardwareData: {
           accountPath,
@@ -1041,19 +1052,7 @@ export const startImportFromHardwareWallet =
       }),
     ) as Wallet;
 
-    if (key) {
-      key.wallets = key.wallets || [];
-      key.wallets.push(wallet);
-    } else {
-      key = buildKeyObj({
-        key: undefined,
-        wallets: [wallet],
-        backupComplete: true,
-      });
-      key.id = hwKeyId;
-      key.keyName = hwKeyName;
-      key.hardwareSource = hardwareSource;
-    }
+    key.wallets.push(wallet);
 
     dispatch(
       successCreateKey({
@@ -1062,7 +1061,6 @@ export const startImportFromHardwareWallet =
     );
 
     await dispatch(startGetRates({force: true}));
-
     await dispatch(startUpdateAllWalletStatusForKey({key, force: true}));
     await sleep(1000);
     await dispatch(updatePortfolioBalance());

@@ -1,6 +1,7 @@
 import {
   Key,
   KeyMethods,
+  SupportedHardwareSource,
   Token,
   TransactionProposal,
   Wallet,
@@ -163,6 +164,7 @@ export const buildKeyObj = ({
   totalBalanceLastDay = 0,
   backupComplete = false,
   hideKeyBalance = false,
+  hardwareSource,
 }: {
   key: KeyMethods | undefined;
   wallets: Wallet[];
@@ -170,9 +172,14 @@ export const buildKeyObj = ({
   totalBalanceLastDay?: number;
   backupComplete?: boolean;
   hideKeyBalance?: boolean;
+  hardwareSource?: SupportedHardwareSource;
 }): Key => {
   return {
-    id: key?.id ? key.id : 'readonly',
+    id: key?.id
+      ? key.id
+      : hardwareSource
+      ? `readonly/${hardwareSource}`
+      : 'readonly',
     wallets,
     properties: key?.toObj(),
     methods: key,
@@ -180,9 +187,14 @@ export const buildKeyObj = ({
     totalBalanceLastDay,
     isPrivKeyEncrypted: key?.isPrivKeyEncrypted(),
     backupComplete,
-    keyName: key?.id ? 'My Key' : 'Read Only',
+    keyName: key?.id
+      ? 'My Key'
+      : hardwareSource
+      ? `My ${hardwareSource.charAt(0).toUpperCase()}${hardwareSource.slice(1)}`
+      : 'Read Only',
     hideKeyBalance,
     isReadOnly: !key,
+    hardwareSource,
   };
 };
 
